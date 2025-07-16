@@ -1,1 +1,134 @@
+1. What is the difference between "Merge" and "Append" in Power Query?
+Merge combines columns from two or more tables based on a key (like SQL JOIN).
+Example: Merge Orders and Customers by CustID.
+Append stacks rows from two or more tables with the same columns.
+Example: Append Orders_Jan and Orders_Feb to combine monthly sales.
+2. How do you split a "Full Name" column into "First Name" and "Last Name"?
+Select the Full Name column
+Go to: Transform → Split Column → By Delimiter
+Choose delimiter: Space
+It will create two columns: First Name and Last Name
+3. What is "Pivot Columns" used for?
+Pivot Columns converts values in one column into column headers.
+Example:
+Original:
 
+CustID	Product	Quantity
+101	    Laptop	 1
+101	    Mouse	   2
+
+After Pivoting "Product":
+
+CustID	Laptop	Mouse
+101	     1	    2
+
+4. How do you undo a step in Power Query?
+In the "Applied Steps" pane (right side):
+
+Click the "X" next to the step to delete it
+
+Or, press Ctrl + Z immediately after the action
+
+5. What is the purpose of "Reference" vs. "Duplicate" in queries?
+Duplicate creates a copy of the query with all steps, which are independent
+
+Reference creates a new query that is linked to the original, so changes to the source affect the reference
+
+6. Merge Orders.csv and Customers.xlsx on CustID (inner join).
+Steps:
+
+Load both tables into Power Query
+
+Select Orders → Home → Merge Queries
+
+Choose Customers as the second table
+
+Join on CustID
+
+Join kind: Inner
+
+Expand the merged columns
+
+7. Pivot the Product column to show total Quantity per product.
+Steps:
+
+Select the Product column
+
+Go to: Transform → Pivot Column
+
+Values column: Quantity
+
+Aggregate function: Sum
+
+Result: Each product becomes a column with total Quantity values.
+
+8. Append two tables with identical columns (e.g., Orders_Jan.csv + Orders_Feb.csv).
+Steps:
+
+Load both tables
+
+Go to: Home → Append Queries
+
+Select both tables
+
+Result: One combined table with all rows
+
+9. Use "Fill Down" to replace nulls in the Email column with the previous value.
+Steps:
+
+Select Email column
+
+Go to: Transform → Fill → Down
+
+This fills nulls with the last non-null value above them.
+
+10. Extract the domain (e.g., "example.com") from the Email column.
+Steps:
+
+Use this M-code in Add Column → Custom Column:
+Text.AfterDelimiter([Email], "@")
+11. Write M-code to merge queries dynamically based on a parameter (e.g., JoinType = "Inner").
+Example:
+let
+    JoinType = "Inner",
+    Merged = Table.NestedJoin(Orders, {"CustID"}, Customers, {"CustID"}, "NewTable", JoinKind.Inner)
+in
+    Merged
+To make it fully dynamic, replace JoinKind.Inner with a variable switch if needed.
+
+12. Unpivot a table with columns like "Jan_Sales," "Feb_Sales" into a "Month" and "Sales" format.
+Steps:
+
+Select Jan_Sales, Feb_Sales, etc.
+
+Go to: Transform → Unpivot Columns
+
+Result: Columns become rows
+
+One column = "Month"
+
+One column = "Sales"
+
+13. Handle errors in a custom column (e.g., division by zero) using try...otherwise.
+Example:
+try [Revenue] / [UnitsSold] otherwise 0
+This avoids errors and returns 0 if division by zero happens.
+
+14. Create a function in Power Query to clean phone numbers (e.g., remove dashes).
+Steps:
+Go to Home → Advanced Editor
+Write a custom function:
+(phone as text) =>
+let
+    cleaned = Text.Select(phone, {"0".."9"})
+in
+    cleaned
+Then apply it to your phone number column using Invoke Custom Function
+
+15. Optimize a query with 10+ steps—identify bottlenecks and simplify.
+Tips:
+Remove unused columns early
+Avoid excessive change type steps
+Merge/join only when needed
+Use buffering for repeated queries: Table.Buffer(Source)
+Check for redundant steps in Applied Steps and remove them
