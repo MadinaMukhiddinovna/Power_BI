@@ -1,1 +1,155 @@
 
+1. What is the purpose of the "Applied Steps" pane in Power Query?
+The "Applied Steps" pane in Power Query shows a list of all the transformation steps that have been applied to your data in order.
+Each time you make a change (e.g., remove rows, rename columns), Power Query records it as a step. 
+This helps track, edit, or delete specific actions without starting over.
+
+2. How do you remove duplicate rows in Power Query?
+To remove duplicates:
+
+Go to the "Home" tab
+
+Click on "Remove Rows" → "Remove Duplicates"
+
+It removes rows where all selected columns have identical values.
+
+3. What does the "Filter" icon do in Power Query?
+The Filter icon (downward arrow next to column headers) allows you to:
+
+Filter rows based on values (e.g., only show rows with "Laptop")
+
+Filter based on number/text/date conditions
+
+Remove or keep rows that meet certain criteria
+
+4. How would you rename a column from "CustID" to "CustomerID"?
+Right-click the "CustID" column header
+
+Select "Rename"
+
+Type "CustomerID"
+
+Alternatively, use M-code:
+
+m
+Копировать
+Редактировать
+Table.RenameColumns(Source, {{"CustID", "CustomerID"}})
+5. What happens if you click "Close & Apply" in Power Query?
+When you click "Close & Apply":
+
+All your transformations are saved
+
+Power BI loads the transformed data into the Data Model
+
+You can then use the data in your report visuals
+
+6. Remove all rows where Quantity is less than 2.
+Steps:
+
+Click on the Quantity column
+
+Go to "Home" → "Keep Rows" → "Keep Rows Where"
+
+Choose: "is greater than or equal to 2"
+
+Result: Only rows with Quantity 2 or more will remain.
+
+7. Split the OrderDate column into separate "Year," "Month," and "Day" columns.
+Steps:
+
+Select OrderDate
+
+Go to "Add Column" → "Date" → select "Year", "Month", and "Day"
+
+You can also use:
+
+Date.Year([OrderDate])
+
+Date.Month([OrderDate])
+
+Date.Day([OrderDate])
+
+These create 3 new columns: Year, Month, and Day.
+
+8. Replace all "Mouse" entries in the Product column with "Computer Mouse."
+Steps:
+
+Right-click on the Product column
+
+Choose "Replace Values"
+
+Replace "Mouse" with "Computer Mouse"
+
+9. Sort the table by OrderDate (newest first).
+Steps:
+
+Click on OrderDate
+
+Go to "Sort Descending" (Z → A)
+
+This arranges dates from most recent to oldest.
+
+10. How would you handle null values in the Price column?
+You can:
+
+Replace nulls with 0 or a default value:
+
+Right-click Price → "Replace Values" → Replace null with 0
+
+Or, remove rows with null:
+
+"Remove Rows" → "Remove Blank Rows"
+
+11. Write custom M-code to add a column calculating TotalSpent = Quantity * Price.
+Go to "Add Column" → "Custom Column" and write:
+
+= [Quantity] * [Price]
+Or in M-code:
+
+Table.AddColumn(PreviousStep, "TotalSpent", each [Quantity] * [Price])
+12. Group the table by CustID to show total spending per customer.
+Steps:
+Click CustID
+Go to "Group By"
+Group by: CustID
+New column: TotalSpent
+Operation: Sum of TotalSpent
+
+13. Fix inconsistent date formats (e.g., 01/10/2023 vs. 2023-01-10) in OrderDate.
+Steps:
+
+Change column type to "Date"
+Right-click OrderDate → "Change Type" → Date
+Power Query converts all values into a consistent format
+
+14. Create a conditional column: Label orders as "High Value" if Price > 100.
+Steps:
+Go to "Add Column" → "Conditional Column"
+Name: "ValueType"
+If Price > 100 → then "High Value" else "Normal"
+
+15. Optimize the query to reduce refresh time (e.g., remove unused columns early).
+Best practices:
+Remove unnecessary columns as the first step
+Use filters early to reduce rows
+Avoid unnecessary transformations
+Use "Table.Buffer" if needed for performance tuning
+
+
+STEP-BY-STEP IN POWER BI (Power Query)
+Open Power BI → Home → Get Data → Text/CSV
+Load both: Customer_Orders.txt and Orders.txt
+In Power Query:
+Merge tables on CustID if needed
+Remove duplicates: Home → Remove Rows → Remove Duplicates
+Filter Quantity ≥ 2: Keep Rows → Keep Rows Where
+Replace “Mouse” with “Computer Mouse”: Transform → Replace Values
+Sort by OrderDate descending: Sort Descending
+Split OrderDate into Year/Month/Day: Add Column → Date
+Handle nulls in Price: Replace Values or Remove Rows
+Add TotalSpent: Add Column → Custom Column → [Quantity]*[Price]
+Group by CustID: Transform → Group By
+Create conditional column: Add Column → Conditional Column
+Optimize: Remove unused columns at the start
+Click Close & Apply
