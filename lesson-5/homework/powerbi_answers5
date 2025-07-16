@@ -1,1 +1,98 @@
 
+1. What is a primary key in a table?
+A primary key is a column (or a set of columns) that uniquely identifies each row in a table.
+It must contain unique values
+Cannot have nulls
+ Example:
+In Customer.csv, the column CustomerID is the primary key. 
+
+2. Name the two types of table relationships in Power BI.
+One-to-Many (1:*) — most common
+Many-to-Many (:) — more complex and needs special handling
+
+3. How do you create a relationship between two tables in Power BI?
+Steps:
+Go to Model view
+Drag the key field (e.g., CustomerID in Sales) to the related key in another table (CustomerID in Customer)
+Power BI creates the relationship (you can set cardinality and direction)
+
+4. What is a "star schema"?
+A star schema is a data model where:
+A central Fact Table (like Sales) stores measurable data
+It links to multiple Dimension Tables (like Customer, Product)
+It looks like a star — fact in the middle, dimensions around.
+
+5. Which table is typically the fact table in a sales dataset?
+The Sales table is usually the fact table.
+It contains transactional data: quantities, dates, product IDs, etc.
+
+6. Link Sales.csv to Customers.csv using CustomerID (one-to-many).
+Steps:
+CustomerID is primary key in Customer.csv (unique)
+CustomerID is foreign key in Sales.csv
+Relationship: Customer[CustomerID] 1 → * Sales[CustomerID]
+
+7. Why is ProductID in Sales.csv a foreign key?
+Because ProductID in Sales.csv refers to the ProductID in Products.csv.
+It connects the fact table (Sales) to the dimension table (Products).
+
+8. Fix a relationship error where ProductID has mismatched data types.
+Steps:
+Go to Power Query or Model view
+Ensure both columns (Sales[ProductID] and Products[ProductID]) have the same data type (e.g., whole number)
+Change type: Transform → Data Type → Whole Number
+
+9. Explain why a star schema improves performance.
+Simplifies relationships
+Minimizes filtering paths
+Optimized for VertiPaq engine (Power BI’s storage engine)
+Better compression and query speed
+
+10. Add a new column TotalSales in Sales (Quantity * Price from Products).
+Steps:
+Create relationship between Sales[ProductID] and Products[ProductID]
+Create calculated column in Sales:
+TotalSales = Sales[Quantity] * RELATED(Products[Price])
+
+11. Optimize a model with circular relationships—how would you resolve it?
+Circular relationships create ambiguity.
+To fix:
+Remove or redesign one of the relationships
+Use DAX instead of physical relationship
+Avoid bidirectional filters if not necessary
+Create bridge tables when needed
+
+12. Create a role-playing dimension for OrderDate and ShipDate.
+Steps:
+Create a Date table
+Duplicate it: one for OrderDate, one for ShipDate
+Create two separate relationships from Sales:
+Sales[OrderDate] → Calendar_Order[Date]
+Sales[ShipDate] → Calendar_Ship[Date]
+Mark only one as active, use USERELATIONSHIP() for the other
+
+13. Handle a many-to-many relationship between Customers and Products.
+If there's no direct key:
+Create a bridge table with combinations of CustomerID and ProductID
+Use that table to connect Customers ↔ Bridge ↔ Products
+OR:
+Use composite models and set relationship as many-to-many, if supported by data structure
+
+14. Use bidirectional filtering sparingly—when is it appropriate?
+Use only when:
+You need filters to flow in both directions
+You're working with composite keys or many-to-many joins
+Required for accurate measures or slicers in complex models
+But overusing it can create performance issues or circular paths.
+
+15. Write DAX to enforce referential integrity if a CustomerID is deleted.
+dax
+ValidCustomerSales =
+CALCULATE (
+    COUNTROWS(Sales),
+    FILTER (
+        Sales,
+        NOT ISBLANK ( RELATED ( Customer[CustomerID] ) )
+    )
+)
+This measure counts only sales linked to existing customers.
